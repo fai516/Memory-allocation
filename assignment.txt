@@ -1,0 +1,33 @@
+Writing your own allocators in C++
+----------------------------------
+
+For this assignment, you will implement first-, next-, and best-fit allocators in C++
+and measure their efficiency at allocating memory.
+Each allocator will be implemented as a class with member functions that allow you to allocate
+a given number of bytes or to deallocate a given pointer:
+	void* alloc(size_t bytes); // Returns a pointer to the allocated memory
+	void dealloc(void* pointer); // Frees the memory associated with the given pointer
+
+Consult simple.cpp for an idea of the structure of your code.
+
+We will provide you a trace of allocations and deallocations
+(or code to randomly generate these and a seed for the RNG);
+you will need to make each allocation and deallocation in order,
+recording efficiency statistics at each event.
+
+To measure your allocators' efficiencies, at the beginning of each allocation and deallocation
+you should record the following information:
+- Number of free bytes available to your allocator
+- Number of contiguous regions of free bytes (i.e., how many fragments is the free memory split into)
+- Maximum free region size
+- Minimum free region size
+
+Include functionality to save this data to a CSV file.
+
+For your analysis, plot the following three time series:
+1. Max free size / total free bytes
+2. Average free size / total free bytes
+3. Min free size / total free bytes
+
+Each of these values should fall between 0 and 1.
+In the case that there are no free bytes, please report 0 for all values (instead of infinity).
