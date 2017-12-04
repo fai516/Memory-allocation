@@ -1,6 +1,7 @@
 #include<iostream>
 #include<stdexcept>
 #include<vector>
+#include <utility>
 
 using namespace std;
 
@@ -27,11 +28,12 @@ class Simple
     {
       if(first_free + bytes <= pool_size)
       {
-        cout << "Allocating " << bytes << " bytes" << endl;
+        //cout << "Allocating " << bytes << " bytes" << endl;
         size_t allocated = first_free;
         first_free += bytes;
-        cout << "out1 -- " << &pool[allocated] << endl;
-        return &pool[allocated];
+        //cout << "out1 -- " << &pool+allocated << endl;
+        //return &pool[allocated];
+        return &pool+allocated;
       }
       else
       {
@@ -42,7 +44,7 @@ class Simple
 
     void dealloc(void* thing)
     {
-      cout << "Deallocating address " << thing << endl;
+      //cout << "Deallocating address " << thing << endl;
       // If we did deallocation, the code would go here
     }
 };
@@ -57,13 +59,14 @@ int main()
 
   for(unsigned int i = 0; i < 1000; i++)
   {
+    cout << allocations.size() << endl;
     if(allocations.size() == 0 || rand() %2) // Allocate something
     {
       try
       {
         size_t size = rand() % 127 + 1; // Allocate between 1 and 128 bytes
         void* p = allocator.alloc(size);
-        cout << "omg - " << p<< endl;
+        //cout << "Current " << size << " bytes - " << p << endl;
         allocations.push_back(p);
         
       }

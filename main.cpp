@@ -2,8 +2,10 @@
 #include <cmath>
 #include <map>
 #include <iostream>
+#include <cstdint>
 #include <stdexcept>
 #include <vector>
+#include <utility>
 using namespace std;
 
 
@@ -40,26 +42,69 @@ public:
 class BestFit{
   static const size_t pool_size=1024;
   char pool[pool_size];
-  map<void*,int> memory_map;
-  vector<int> region_size;
+  int free_space;
+  map<void*,int> 
+  vector< pair<int,int> > record;
 
-  size_t first_free;
+  int getFreeSpaceAmount(int pos){
+    int count=0;
+    while(pool[pos+count]==' '){
+      count++;
+    }
+    return count;
+  }
+
+  bool isTheBest(int min_bound,int max_bound,int n){ //[min_bound,max_bound)
+    if(n>=min_bound && n<max_bound){
+      return true;
+    }
+    return false;
+  }
+
+  void fill(int start,int amount){
+    for(int i=0;i<amount;i++){
+      pool[start+i]='@';
+    }
+  }
+
+  void insertRecord(int position,int amount){
+    fill(position,amount);
+    pair<int,int> tmp (position,amount);
+    record.push_back(tmp);
+  }
+  void deleteRecord(int position){}
 public:
+  BestFit(): free_space(pool_size) {
+    for(int i=0;i<pool_size;i++){
+      pool[i] = ' ';
+    }
+  }
+
   void* alloc(size_t bytes){
-    if(first_free + bytes <= pool_size){
+    int best = INT_MAX;
+    int ideal_pos = -1;
+    for(int i=0;i<pool_size;i++){
+      int count = 0;
+      if(pool[i]!=' '){
+        int freeSpace = getFreeSpaceAmount(i);
+        if(isTheBest(bytes,best,freeSpace))
+          ideal_pos = i;
+        i += freeSpace;
+      }
+    }
+    if(ideal_pos>=0){
+      free_space -= bytes;
       cout << "Allocating " << bytes << " bytes" << endl;
-      size_t allocated = first_free;
-      first_free += bytes;
-      cout << "out1 -- " << &pool[allocated] << endl;
-      return &pool[allocated];
+      insertRecord(ideal_pos,bytes);
+      return &pool+ideal_pos;
     }
     else{
-      //cout << "Could not allocate " << bytes << " bytes" << endl;
+      cout << "Could not allocate " << bytes << " bytes" << endl;
       throw bad_alloc();
     }
   }
 
-  void dealloc(void* thing)
+  void dealloc()
   {
     cout << "Deallocating address " << thing << endl;
     // If we did deallocation, the code would go here
@@ -84,12 +129,6 @@ int main() {
   Clock clock;
   clock.start();
 
-  char a = 'a';
-  char b = 'b';
-  char *p = &a;
-  char *q = &b;
-  cout << &p << endl << &q << endl;
-  cout << "gg" << __SIZEOF_POINTER__ << "gg" << endl;
 
   cout << clock.getElapsed() << endl;
   return 1;
